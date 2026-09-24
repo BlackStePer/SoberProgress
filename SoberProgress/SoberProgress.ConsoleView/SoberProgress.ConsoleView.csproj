@@ -7,4 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SoberProgress.DataAccess\SoberProgress.DataAccess.csproj" />
+    <ProjectReference Include="..\SoberProgress.Domain\SoberProgress.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

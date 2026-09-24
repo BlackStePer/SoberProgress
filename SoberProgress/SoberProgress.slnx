@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="SoberProgress.ConsoleView/SoberProgress.ConsoleView.csproj" />
+  <Project Path="SoberProgress.DataAccess/SoberProgress.DataAccess.csproj" />
   <Project Path="SoberProgress.Domain/SoberProgress.Domain.csproj" />
+  <Project Path="SoberProgress.WinFormsView/SoberProgress.WinFormsView.csproj" />
 </Solution>
