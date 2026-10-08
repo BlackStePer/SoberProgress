@@ -52,9 +52,5 @@ namespace SoberProgress.Domain
                 _users.Remove(user);
             }
         }
-
-        public void Dispose()
-        {
-        }
     }
 }
