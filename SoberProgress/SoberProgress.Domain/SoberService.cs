@@ -42,7 +42,7 @@ namespace SoberProgress.Domain
         {
             AlcoUser user = _repository.ReadById(id);
 
-            if(user == null)
+            if(user is null)
             {
                 return false;
             }
@@ -69,12 +69,7 @@ namespace SoberProgress.Domain
         /// <returns>Удлось ли произвести изменения</returns>
         public bool ChangeUser(AlcoUser user)
         {
-            int id;
-            try
-            {
-                id = user.Id;
-            }
-            catch (Exception ex)
+            if(user is null)
             {
                 return false;
             }
@@ -90,7 +85,7 @@ namespace SoberProgress.Domain
         /// <returns></returns>
         public bool Code(AlcoUser user)
         {
-            if(user == null || user.IsCoded)
+            if(user is null || user.IsCoded)
             {
                 return false;
             }
@@ -135,6 +130,38 @@ namespace SoberProgress.Domain
             return _repository.ReadAll()
                 .OrderByDescending(user => GetDaysSoberCount(user))
                 .ThenByDescending(user => user.IsCoded); 
+        }
+
+        /// <summary>
+        /// Получить статистические данныые
+        /// </summary>
+        /// <returns>Кортеж содержащий: (Среднюю трезвость, количество пользователей, количество закодированных, процент закодированных среди всех)</returns>
+        public (double avgDays, int totalUsers, int codedCount, double codedPercentage) GetSystemStatistics()
+        {
+            var users = _repository.ReadAll().ToList();
+            if (!users.Any()) return (0, 0, 0, 0);
+
+            int total = users.Count;
+            int coded = users.Count(u => u.IsCoded);
+            double avgDays = users.Average(u => GetDaysSoberCount(u));
+            double percentage = ((double)coded / total) * 100;
+
+            return (Math.Round(avgDays, 1), total, coded, Math.Round(percentage, 1));
+        }
+
+        /// <summary>
+        /// Получить психологический ранг пользователя
+        /// </summary>
+        public string GetSoberStatus(AlcoUser user)
+        {
+            int days = GetDaysSoberCount(user);
+
+            if (days == 0) return "Критическая фаза";
+            if (days < 7) return "Детоксикация";
+            if (days < 30) return "Первые шаги";
+            if (days < 90) return "Уверенный подъем";
+            if (days < 365) return "Стабильная трезвость";
+            return "Трезвый мудрец";
         }
     }
 }

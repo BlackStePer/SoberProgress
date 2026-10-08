@@ -35,6 +35,7 @@ namespace SoberProgress.WinFormsView
             dgvLeaderboard.Columns.Add("FullName", "ФИО Пользователя");
             dgvLeaderboard.Columns.Add("DaysSober", "Дней трезвости");
             dgvLeaderboard.Columns.Add("Method", "Метод борьбы");
+            dgvLeaderboard.Columns.Add("SoberRank", "Ранг трезвости");
 
             dgvLeaderboard.Columns["Id"].FillWeight = 15;
         }
@@ -50,8 +51,9 @@ namespace SoberProgress.WinFormsView
                 int days = _service.GetDaysSoberCount(user);
                 string statusText = user.IsCoded ? "Закодирован" : "Самостоятельно";
                 string fullName = $"{user.Surname} {user.Name} {user.Patronymic}";
+                string rank = _service.GetSoberStatus(user);
 
-                int rowIndex = dgvLeaderboard.Rows.Add(user.Id, fullName, days, statusText);
+                int rowIndex = dgvLeaderboard.Rows.Add(user.Id, fullName, days, statusText, rank);
 
                 if (user.IsCoded)
                 {
@@ -59,6 +61,17 @@ namespace SoberProgress.WinFormsView
                     dgvLeaderboard.Rows[rowIndex].DefaultCellStyle.ForeColor = Color.DarkGoldenrod;
                 }
             }
+
+            UpdateStatisticsDisplay();
+        }
+
+        private void UpdateStatisticsDisplay()
+        {
+            var stats = _service.GetSystemStatistics();
+            Stats.Text = $"  [АНАЛИТИКА СИСТЕМЫ]  " +
+                                 $"Всего на учете: {stats.totalUsers} чел.  |  " +
+                                 $"Средняя трезвость: {stats.avgDays} дн.  |  " +
+                                 $"Закодировано: {stats.codedCount} ({stats.codedPercentage}%)";
         }
 
         private int? GetSelectedUserId()

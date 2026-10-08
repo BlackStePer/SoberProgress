@@ -105,10 +105,11 @@ namespace SoberProgress.ConsoleView
 
                 string statusText = user.IsCoded ? "Закодирован" : "Самостоятельно";
                 string fullName = $"{user.Surname} {user.Name} {user.Patronymic}";
+                string rank = _service.GetSoberStatus(user);
 
                 if (user.IsCoded) Console.ForegroundColor = ConsoleColor.Yellow;
 
-                Console.WriteLine($"{user.Id,-4} | {fullName,-30} | {days,-10} | {statusText,-15}");
+                Console.WriteLine($"{user.Id,-4} | {fullName,-30} | {days,-10} | {statusText + " [" + rank + "]",-25}");
                 Console.ResetColor();
             }
         }
@@ -116,6 +117,12 @@ namespace SoberProgress.ConsoleView
         private void ShowLeaderboardMenu()
         {
             Console.Clear();
+
+            var stats = _service.GetSystemStatistics();
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine($"[СТАТИСТИКА СИСТЕМЫ] Всего на учете: {stats.totalUsers} | Средняя трезвость: {stats.avgDays} дн. | Закодировано: {stats.codedCount} ({stats.codedPercentage}%)");
+            Console.ResetColor();
+
             Console.WriteLine("=========================================================================");
             Console.WriteLine("                       ГЛУБОКИЙ ТИР-ЛИСТ ТРЕЗВОСТИ                       ");
             Console.WriteLine("=========================================================================");

@@ -41,6 +41,7 @@
             label2 = new Label();
             label3 = new Label();
             label4 = new Label();
+            Stats = new Label();
             ((System.ComponentModel.ISupportInitialize)dgvLeaderboard).BeginInit();
             SuspendLayout();
             // 
@@ -49,7 +50,7 @@
             dgvLeaderboard.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvLeaderboard.Location = new Point(509, 23);
             dgvLeaderboard.Name = "dgvLeaderboard";
-            dgvLeaderboard.Size = new Size(432, 384);
+            dgvLeaderboard.Size = new Size(546, 300);
             dgvLeaderboard.TabIndex = 0;
             // 
             // txtSurname
@@ -157,11 +158,25 @@
             label4.TabIndex = 12;
             label4.Text = "Дата последнего срыва:";
             // 
+            // Stats
+            // 
+            Stats.AutoSize = true;
+            Stats.BackColor = SystemColors.ActiveCaption;
+            Stats.BorderStyle = BorderStyle.Fixed3D;
+            Stats.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            Stats.Location = new Point(434, 376);
+            Stats.Name = "Stats";
+            Stats.Size = new Size(45, 19);
+            Stats.TabIndex = 13;
+            Stats.Text = "label5";
+            Stats.TextAlign = ContentAlignment.MiddleLeft;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1008, 450);
+            ClientSize = new Size(1115, 450);
+            Controls.Add(Stats);
             Controls.Add(label4);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -197,5 +212,6 @@
         private Label label2;
         private Label label3;
         private Label label4;
+        private Label Stats;
     }
 }
