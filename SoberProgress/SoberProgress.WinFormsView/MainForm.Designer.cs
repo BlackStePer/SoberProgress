@@ -37,6 +37,10 @@
             btnCode = new Button();
             btnRelapse = new Button();
             btnDelete = new Button();
+            label1 = new Label();
+            label2 = new Label();
+            label3 = new Label();
+            label4 = new Label();
             ((System.ComponentModel.ISupportInitialize)dgvLeaderboard).BeginInit();
             SuspendLayout();
             // 
@@ -71,14 +75,14 @@
             // 
             // dtpLastDrink
             // 
-            dtpLastDrink.Location = new Point(145, 159);
+            dtpLastDrink.Location = new Point(143, 181);
             dtpLastDrink.Name = "dtpLastDrink";
             dtpLastDrink.Size = new Size(200, 23);
             dtpLastDrink.TabIndex = 4;
             // 
             // btnAdd
             // 
-            btnAdd.Location = new Point(157, 38);
+            btnAdd.Location = new Point(157, 23);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(167, 47);
             btnAdd.TabIndex = 5;
@@ -116,11 +120,52 @@
             btnDelete.UseVisualStyleBackColor = true;
             btnDelete.Click += btnDelete_Click;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(91, 81);
+            label1.Name = "label1";
+            label1.Size = new Size(61, 15);
+            label1.TabIndex = 9;
+            label1.Text = "Фамилия:";
+            label1.Click += label1_Click;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(224, 81);
+            label2.Name = "label2";
+            label2.Size = new Size(34, 15);
+            label2.TabIndex = 10;
+            label2.Text = "Имя:";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(330, 81);
+            label3.Name = "label3";
+            label3.Size = new Size(61, 15);
+            label3.TabIndex = 11;
+            label3.Text = "Отчество:";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new Point(171, 154);
+            label4.Name = "label4";
+            label4.Size = new Size(139, 15);
+            label4.TabIndex = 12;
+            label4.Text = "Дата последнего срыва:";
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1008, 450);
+            Controls.Add(label4);
+            Controls.Add(label3);
+            Controls.Add(label2);
+            Controls.Add(label1);
             Controls.Add(btnDelete);
             Controls.Add(btnRelapse);
             Controls.Add(btnCode);
@@ -148,5 +193,9 @@
         private Button btnCode;
         private Button btnRelapse;
         private Button btnDelete;
+        private Label label1;
+        private Label label2;
+        private Label label3;
+        private Label label4;
     }
 }

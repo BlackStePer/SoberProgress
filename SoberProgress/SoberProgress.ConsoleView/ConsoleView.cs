@@ -13,7 +13,7 @@ namespace SoberProgress.ConsoleView
         public ConsoleView(SoberService service)
         {
             _service = service;
-            SeedData();
+            //SeedData();
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace SoberProgress.ConsoleView
                 switch (choice)
                 {
                     case "1": RegisterNewUser(); break;
-                    case "2": ShowLeaderboard(); break;
+                    case "2": ShowLeaderboardMenu(); break;
                     case "3": CodeUser(); break;
                     case "4": ProcessRelapse(); break;
                     case "5": DeleteUser(); break;
@@ -98,13 +98,6 @@ namespace SoberProgress.ConsoleView
 
         private void ShowLeaderboard()
         {
-            Console.Clear();
-            Console.WriteLine("=========================================================================");
-            Console.WriteLine("                       ГЛУБОКИЙ ТИР-ЛИСТ ТРЕЗВОСТИ                       ");
-            Console.WriteLine("=========================================================================");
-            Console.WriteLine($"{"ID",-4} | {"ФИО",-30} | {"Дней трезв",-10} | {"Статус",-15}");
-            Console.WriteLine("-------------------------------------------------------------------------");
-
             var leaderboard = _service.GetLeaderboard();
             foreach (var user in leaderboard)
             {
@@ -113,11 +106,23 @@ namespace SoberProgress.ConsoleView
                 string statusText = user.IsCoded ? "Закодирован" : "Самостоятельно";
                 string fullName = $"{user.Surname} {user.Name} {user.Patronymic}";
 
-                if (user.IsCoded) Console.ForegroundColor = ConsoleColor.Yellow; 
+                if (user.IsCoded) Console.ForegroundColor = ConsoleColor.Yellow;
 
                 Console.WriteLine($"{user.Id,-4} | {fullName,-30} | {days,-10} | {statusText,-15}");
                 Console.ResetColor();
             }
+        }
+
+        private void ShowLeaderboardMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("=========================================================================");
+            Console.WriteLine("                       ГЛУБОКИЙ ТИР-ЛИСТ ТРЕЗВОСТИ                       ");
+            Console.WriteLine("=========================================================================");
+            Console.WriteLine($"{"ID",-4} | {"ФИО",-30} | {"Дней трезв",-10} | {"Статус",-15}");
+            Console.WriteLine("-------------------------------------------------------------------------");
+
+            ShowLeaderboard();
 
             Console.WriteLine("\nНажмите любую клавишу для возврата в меню...");
             Console.ReadKey();
@@ -127,6 +132,9 @@ namespace SoberProgress.ConsoleView
         {
             Console.Clear();
             Console.WriteLine("=== ПРОЦЕДУРА КОДИРОВАНИЯ ===");
+
+            ShowLeaderboard();
+
             Console.Write("Введите ID пользователя для кодирования: ");
 
             if (int.TryParse(Console.ReadLine(), out int id))
@@ -160,6 +168,9 @@ namespace SoberProgress.ConsoleView
         {
             Console.Clear();
             Console.WriteLine("=== ФИКСАЦИЯ СРЫВА ===");
+
+            ShowLeaderboard();
+
             Console.Write("Введите ID сорвавшегося пользователя: ");
 
             if (int.TryParse(Console.ReadLine(), out int id))
@@ -193,6 +204,9 @@ namespace SoberProgress.ConsoleView
         {
             Console.Clear();
             Console.WriteLine("=== Удаление ИЗ СИСТЕМЫ ===");
+
+            ShowLeaderboard();
+
             Console.Write("Введите ID пользователя для удаления: ");
 
             if (int.TryParse(Console.ReadLine(), out int id))

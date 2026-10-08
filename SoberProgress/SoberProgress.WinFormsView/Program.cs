@@ -1,3 +1,4 @@
+using SoberProgress.DataAccess;
 using SoberProgress.Domain;
 using SoberProgress.Domain.ModelInterfaces;
 
@@ -11,11 +12,11 @@ namespace SoberProgress.WinFormsView
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            IRepository<AlcoUser> repository = new ClassicalRepo();
+            IRepository<AlcoUser> repository = new EntityRepository<AlcoUser>();
 
             SoberService soberService = new SoberService(repository);
 
-            SeedData(soberService);
+            //SeedData(soberService);
 
             Application.Run(new MainForm(soberService));
         }

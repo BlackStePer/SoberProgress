@@ -14,8 +14,8 @@ namespace SoberProgress.WinFormsView
             InitializeComponent();
             _service = service;
 
-            FormBorderStyle = FormBorderStyle.FixedSingle; 
-            MaximizeBox = false;                           
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
             StartPosition = FormStartPosition.CenterScreen;
 
             ConfigureDataGridView();
@@ -156,6 +156,11 @@ namespace SoberProgress.WinFormsView
                     MessageBox.Show("Не удалось найти или удалить пользователя.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
