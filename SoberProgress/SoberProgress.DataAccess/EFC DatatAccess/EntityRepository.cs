@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SoberProgress.Domain;
 using SoberProgress.Domain.ModelInterfaces;
 
 namespace SoberProgress.DataAccess
 {
-    public class EntityRepository<T> : IRepository<T> where T : class, IDomainObject
+    public class EntityRepository<T> : IRepository<T> where T : class, IDomainObject, new()
     {
         public EntityRepository()
         {

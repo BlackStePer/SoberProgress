@@ -7,9 +7,9 @@ namespace SoberProgress.Domain
     /// </summary>
     public class SoberService
     {
-        private IRepository<AlcoUser> _repository;
+        private IDomainRepository<AlcoUser> _repository;
 
-        public SoberService(IRepository<AlcoUser> repository)
+        public SoberService(IDomainRepository<AlcoUser> repository)
         {
             _repository = repository;
         }
@@ -152,6 +152,8 @@ namespace SoberProgress.Domain
         /// <summary>
         /// Получить психологический ранг пользователя
         /// </summary>
+        /// <param name="user">Данные о пользователе</param>
+        /// <returns>Ранг</returns>
         public string GetSoberStatus(AlcoUser user)
         {
             int days = GetDaysSoberCount(user);

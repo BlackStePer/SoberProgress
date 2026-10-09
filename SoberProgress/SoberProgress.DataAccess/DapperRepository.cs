@@ -6,7 +6,7 @@ using System.Data;
 
 namespace SoberProgress.DataAccess
 {
-    public class DapperRepository<T> : IRepository<T> where T : class, IDomainObject
+    public class DapperRepository<T> : IRepository<T> where T : class, IDomainObject, new()
     {
         private readonly string _connectionString = "Data Source=sober.db";
 
