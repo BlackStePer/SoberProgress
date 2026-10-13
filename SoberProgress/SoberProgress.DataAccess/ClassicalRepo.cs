@@ -5,7 +5,7 @@ namespace SoberProgress.Domain
     /// <summary>
     /// Реализация IRtpository через список
     /// </summary>
-    public class ClassicalRepo : IDomainRepository<AlcoUser>
+    public class ClassicalRepo : ICRUDRepository<AlcoUser>
     {
         private readonly List<AlcoUser> _users = new List<AlcoUser>();
 

@@ -7,9 +7,9 @@ namespace SoberProgress.Domain
     /// </summary>
     public class SoberService
     {
-        private IDomainRepository<AlcoUser> _repository;
+        private ICRUDRepository<AlcoUser> _repository;
 
-        public SoberService(IDomainRepository<AlcoUser> repository)
+        public SoberService(ICRUDRepository<AlcoUser> repository)
         {
             _repository = repository;
         }

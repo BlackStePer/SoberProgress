@@ -8,11 +8,13 @@ namespace SoberProgress.ConsoleView
     {
         static void Main(string[] args)
         {
-            IRepository<AlcoUser> repository = new DapperRepository<AlcoUser>();
-            SoberService soberService = new SoberService(repository);
+            using (IRepository<AlcoUser> repository = new DapperRepository<AlcoUser>())
+            {
+                SoberService soberService = new SoberService(repository);
 
-            ConsoleView app = new ConsoleView(soberService);
-            app.Run();
+                ConsoleView app = new ConsoleView(soberService);
+                app.Run();
+            }
         }
     }
 }

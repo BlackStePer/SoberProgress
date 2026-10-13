@@ -1,9 +1,9 @@
 ﻿namespace SoberProgress.Domain.ModelInterfaces;
 
 /// <summary>
-/// Репозиторий для объектов требующих подключения
+/// Репозиторий требующий отключений через Dispose
 /// </summary>
 /// <typeparam name="T">Тип объектов репозитория</typeparam>
-public interface IRepository<T> : IDomainRepository<T> where T : IDomainObject, new()
+public interface IRepository<T> : ICRUDRepository<T>, IDisposable where T : IDomainObject, new()
 {
 }

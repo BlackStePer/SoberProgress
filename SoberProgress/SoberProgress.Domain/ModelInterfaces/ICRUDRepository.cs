@@ -1,10 +1,10 @@
 ﻿namespace SoberProgress.Domain.ModelInterfaces;
 
 /// <summary>
-/// Репозиторий модели, для хранилищь данных не требующие подключения
+/// Репозиторий предоставляющий CRUD операции
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface IDomainRepository<T> where T : IDomainObject, new()
+public interface ICRUDRepository<T> where T : IDomainObject, new()
 {
     /// <summary>
     /// Получить колекцию всех объектов репозитория

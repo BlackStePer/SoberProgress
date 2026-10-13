@@ -12,13 +12,14 @@ namespace SoberProgress.WinFormsView
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            IRepository<AlcoUser> repository = new EntityRepository<AlcoUser>();
+            using (IRepository<AlcoUser> repository = new EntityRepository<AlcoUser>())
+            {
+                SoberService soberService = new SoberService(repository);
 
-            SoberService soberService = new SoberService(repository);
+                // SeedData(soberService);
 
-            //SeedData(soberService);
-
-            Application.Run(new MainForm(soberService));
+                Application.Run(new MainForm(soberService));
+            }
         }
 
         private static void SeedData(SoberService service)
