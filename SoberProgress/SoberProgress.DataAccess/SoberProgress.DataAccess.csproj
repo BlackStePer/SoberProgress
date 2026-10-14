@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.csproj" />
     <ProjectReference Include="..\SoberProgress.Domain\SoberProgress.Domain.csproj" />
   </ItemGroup>
 
