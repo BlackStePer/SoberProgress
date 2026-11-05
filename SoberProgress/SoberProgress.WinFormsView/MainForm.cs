@@ -1,25 +1,47 @@
-using SoberProgress.Domain;
+using PresenterSpace;
+using PresenterSpace.DTO;
 
 namespace SoberProgress.WinFormsView
 {
     /// <summary>
     /// Основная форма программы
     /// </summary>
-    public partial class MainForm : Form
+    public partial class MainForm : Form, IView
     {
-        private readonly SoberService _service;
+        public event Action AddUserRequested;
+        public event Action CodeUserRequested;
+        public event Action RelapseUserRequested;
+        public event Action DeleteUserRequested;
 
-        public MainForm(SoberService service)
+
+        public string InputName => txtName.Text;
+        public string InputSurname => txtSurname.Text;
+        public string InputPatronymic => txtPatronymic.Text;
+        public DateTime? InputLastDrinkDate => dtpLastDrink.Value.Date;
+
+        public int? SelectedUserId
+        {
+            get
+            {
+                if (dgvLeaderboard.SelectedRows.Count > 0)
+                {
+                    return Convert.ToInt32(dgvLeaderboard.SelectedRows[0].Cells["Id"].Value);
+                }
+                ShowMessage("Пожалуйста, выберите пользователя из списка!", isError: true);
+                return null;
+            }
+        }
+
+        public MainForm()
         {
             InitializeComponent();
-            _service = service;
 
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             StartPosition = FormStartPosition.CenterScreen;
 
             ConfigureDataGridView();
-            UpdateLeaderboard();
+            WireUiEvents();
         }
 
         private void ConfigureDataGridView()
@@ -40,140 +62,62 @@ namespace SoberProgress.WinFormsView
             dgvLeaderboard.Columns["Id"].FillWeight = 15;
         }
 
-        private void UpdateLeaderboard()
+        private void WireUiEvents()
+        {
+            btnAdd.Click += (s, e) => AddUserRequested?.Invoke();
+            btnCode.Click += (s, e) => CodeUserRequested?.Invoke();
+            btnRelapse.Click += (s, e) => RelapseUserRequested?.Invoke();
+            btnDelete.Click += (s, e) => DeleteUserRequested?.Invoke();
+        }
+
+        public void DisplayLeaderboard(IEnumerable<AlcoUserDTO> leaderboard)
         {
             dgvLeaderboard.Rows.Clear();
 
-            var leaderboard = _service.GetLeaderboard();
-
-            foreach (var user in leaderboard)
+            foreach (var dto in leaderboard)
             {
-                int days = _service.GetDaysSoberCount(user);
-                string statusText = user.IsCoded ? "Закодирован" : "Самостоятельно";
-                string fullName = $"{user.Surname} {user.Name} {user.Patronymic}";
-                string rank = _service.GetSoberStatus(user);
+                int rowIndex = dgvLeaderboard.Rows.Add(dto.Id, dto.FullName, dto.DaysSober, dto.Method, dto.SoberRank);
 
-                int rowIndex = dgvLeaderboard.Rows.Add(user.Id, fullName, days, statusText, rank);
-
-                if (user.IsCoded)
+                if (dto.IsCoded)
                 {
                     dgvLeaderboard.Rows[rowIndex].DefaultCellStyle.BackColor = Color.LightYellow;
                     dgvLeaderboard.Rows[rowIndex].DefaultCellStyle.ForeColor = Color.DarkGoldenrod;
                 }
             }
-
-            UpdateStatisticsDisplay();
         }
 
-        private void UpdateStatisticsDisplay()
+        public void DisplayStatistics(SystemStatisticsDTO stats)
         {
-            var stats = _service.GetSystemStatistics();
             Stats.Text = $"  [АНАЛИТИКА СИСТЕМЫ]  " +
-                                 $"Всего на учете: {stats.totalUsers} чел.  |  " +
-                                 $"Средняя трезвость: {stats.avgDays} дн.  |  " +
-                                 $"Закодировано: {stats.codedCount} ({stats.codedPercentage}%)";
+                         $"Всего на учете: {stats.TotalUsers} чел.  |  " +
+                         $"Средняя трезвость: {stats.AvgDaysSober} дн.  |  " +
+                         $"Закодировано: {stats.CodedCount} ({stats.CodedPercentage}%)";
         }
 
-        private int? GetSelectedUserId()
+        public void ShowMessage(string message, bool isError = false)
         {
-            if (dgvLeaderboard.SelectedRows.Count > 0)
-            {
-                return Convert.ToInt32(dgvLeaderboard.SelectedRows[0].Cells["Id"].Value);
-            }
-            MessageBox.Show("Пожалуйста, выберите пользователя из списка!", "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return null;
+            MessageBoxIcon icon = isError ? MessageBoxIcon.Error : MessageBoxIcon.Information;
+            string caption = isError ? "Внимание / Ошибка" : "Успех";
+            MessageBox.Show(message, caption, MessageBoxButtons.OK, icon);
         }
 
-        private void btnAdd_Click(object sender, EventArgs e)
+        public bool ConfirmAction(string message)
         {
-            if (string.IsNullOrWhiteSpace(txtName.Text) || string.IsNullOrWhiteSpace(txtSurname.Text))
-            {
-                MessageBox.Show("Имя и Фамилия обязательны для заполнения!", "Ошибка валидации", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+            var dialogResult = MessageBox.Show(message, "Подтверждение действия", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            return dialogResult == DialogResult.Yes;
+        }
 
-            DateTime selectedDate = dtpLastDrink.Value.Date;
-
-            _service.AddUser(txtName.Text.Trim(), txtSurname.Text.Trim(), txtPatronymic.Text.Trim(), selectedDate);
-
+        public void ClearInputFields()
+        {
             txtName.Clear();
             txtSurname.Clear();
             txtPatronymic.Clear();
             dtpLastDrink.Value = DateTime.Now;
-
-            UpdateLeaderboard();
-            MessageBox.Show("Пользователь успешно встал на путь трезвости!", "Победа!!!", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void btnCode_Click(object sender, EventArgs e)
+        public void Run()
         {
-            int? userId = GetSelectedUserId();
-            if (userId == null) return;
-
-            AlcoUser user = _service.ReadUser(userId.Value);
-            if (user != null)
-            {
-                bool success = _service.Code(user);
-                if (success)
-                {
-                    UpdateLeaderboard();
-                    MessageBox.Show($"{user.Name} успешно закодирован, теперь он не такой алкаш!", "Кодирование успешно", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    MessageBox.Show("Пользователь уже находится под кодировкой!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void btnRelapse_Click(object sender, EventArgs e)
-        {
-            int? userId = GetSelectedUserId();
-            if (userId == null) return;
-
-            AlcoUser user = _service.ReadUser(userId.Value);
-            if (user != null)
-            {
-                var dialogResult = MessageBox.Show($"Вы уверены, что хотите зафиксировать срыв для {user.Name}?", "Внимание! Срыв прогресса", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
-                if (dialogResult == DialogResult.Yes)
-                {
-                    user.LastDrinkDate = DateTime.Now;
-                    user.IsCoded = false;
-
-                    _service.ChangeUser(user);
-
-                    UpdateLeaderboard();
-                    MessageBox.Show("Счетчик трезвости обнулен. Путь начинается сначала.", "Данные обновлены", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-        }
-
-        private void btnDelete_Click(object sender, EventArgs e)
-        {
-            int? userId = GetSelectedUserId();
-            if (userId == null) return;
-
-            var dialogResult = MessageBox.Show("Удалить пользователя из системы трезвости?", "Подтверждение удаления", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (dialogResult == DialogResult.Yes)
-            {
-                bool deleted = _service.RemoveUser(userId.Value);
-                if (deleted)
-                {
-                    UpdateLeaderboard();
-                    MessageBox.Show("Пользователь удален.", "Успешно", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    MessageBox.Show("Не удалось найти или удалить пользователя.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
+            Application.Run(this);
         }
     }
 }

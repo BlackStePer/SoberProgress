@@ -89,7 +89,6 @@
             btnAdd.TabIndex = 5;
             btnAdd.Text = "Добавить Алкаша";
             btnAdd.UseVisualStyleBackColor = true;
-            btnAdd.Click += btnAdd_Click;
             // 
             // btnCode
             // 
@@ -99,7 +98,6 @@
             btnCode.TabIndex = 6;
             btnCode.Text = "Закодировать";
             btnCode.UseVisualStyleBackColor = true;
-            btnCode.Click += btnCode_Click;
             // 
             // btnRelapse
             // 
@@ -109,7 +107,6 @@
             btnRelapse.TabIndex = 7;
             btnRelapse.Text = "Отметить Срыв";
             btnRelapse.UseVisualStyleBackColor = true;
-            btnRelapse.Click += btnRelapse_Click;
             // 
             // btnDelete
             // 
@@ -119,7 +116,6 @@
             btnDelete.TabIndex = 8;
             btnDelete.Text = "Удалить алкаша";
             btnDelete.UseVisualStyleBackColor = true;
-            btnDelete.Click += btnDelete_Click;
             // 
             // label1
             // 
@@ -129,7 +125,6 @@
             label1.Size = new Size(61, 15);
             label1.TabIndex = 9;
             label1.Text = "Фамилия:";
-            label1.Click += label1_Click;
             // 
             // label2
             // 

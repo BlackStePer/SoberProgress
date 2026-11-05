@@ -1,6 +1,4 @@
-using SoberProgress.DataAccess;
 using SoberProgress.Domain;
-using SoberProgress.Domain.ModelInterfaces;
 
 namespace SoberProgress.WinFormsView
 {
@@ -9,17 +7,7 @@ namespace SoberProgress.WinFormsView
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-
-            using (IRepository<AlcoUser> repository = new EntityRepository<AlcoUser>())
-            {
-                SoberService soberService = new SoberService(repository);
-
-                // SeedData(soberService);
-
-                Application.Run(new MainForm(soberService));
-            }
+            
         }
 
         private static void SeedData(SoberService service)

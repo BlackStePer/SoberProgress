@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SoberProgress.Domain;
-using SoberProgress.Domain.ModelInterfaces;
+﻿using SoberProgress.Domain.ModelInterfaces;
 
 namespace SoberProgress.DataAccess
 {

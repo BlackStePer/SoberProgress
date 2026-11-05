@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DTO\DTO.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
     <ProjectReference Include="..\SoberProgress.DataAccess\SoberProgress.DataAccess.csproj" />
     <ProjectReference Include="..\SoberProgress.Domain\SoberProgress.Domain.csproj" />
   </ItemGroup>

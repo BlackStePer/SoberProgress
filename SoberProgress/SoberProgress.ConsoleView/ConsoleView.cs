@@ -1,115 +1,126 @@
 ﻿using System.Globalization;
-using SoberProgress.Domain;
+using PresenterSpace;
+using PresenterSpace.DTO;
 
 namespace SoberProgress.ConsoleView
 {
     /// <summary>
     /// Консольное отображение приложения
     /// </summary>
-    public class ConsoleView
+    public class ConsoleView : IView
     {
-        private readonly SoberService _service;
+        public event Action AddUserRequested;
+        public event Action CodeUserRequested;
+        public event Action RelapseUserRequested;
+        public event Action DeleteUserRequested;
 
-        public ConsoleView(SoberService service)
+
+        public string InputName { get; private set; }
+        public string InputSurname { get; private set; }
+        public string InputPatronymic { get; private set; }
+        public DateTime? InputLastDrinkDate { get; private set; }
+        public int? SelectedUserId { get; private set; }
+
+
+        private List<AlcoUserDTO> _currentLeaderboard = new List<AlcoUserDTO>();
+        private SystemStatisticsDTO _currentStats = new SystemStatisticsDTO();
+
+        private bool _running = false;
+
+        public void DisplayLeaderboard(IEnumerable<AlcoUserDTO> leaderboard)
         {
-            _service = service;
-            //SeedData();
+            _currentLeaderboard = leaderboard.ToList();
         }
 
-        /// <summary>
-        /// Запуск основного меню
-        /// </summary>
+        public void DisplayStatistics(SystemStatisticsDTO stats)
+        {
+            _currentStats = stats;
+        }
+
         public void Run()
         {
-            bool running = true;
-            while (running)
+            _running = true;
+            while (_running)
             {
-                Console.Clear();
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("========================================");
-                Console.WriteLine("    ПРОГРАММА МОНИТОРИНГА ТРЕЗВОСТИ     ");
-                Console.WriteLine("             «ТРЕЗВЫЙ ПУТЬ»             ");
-                Console.WriteLine("========================================");
-                Console.ResetColor();
-                Console.WriteLine("1. Зарегистрировать нового пользователя");
-                Console.WriteLine("2. Посмотреть глобальный Лидерборд");
-                Console.WriteLine("3. Закодировать пользователя");
-                Console.WriteLine("4. Изменить данные пользователя (Срыв)");
-                Console.WriteLine("5. Удалить пользователя из системы");
-                Console.WriteLine("0. Выход");
-                Console.WriteLine("----------------------------------------");
-                Console.Write("Выберите действие: ");
-
-                string choice = Console.ReadLine();
-                switch (choice)
-                {
-                    case "1": RegisterNewUser(); break;
-                    case "2": ShowLeaderboardMenu(); break;
-                    case "3": CodeUser(); break;
-                    case "4": ProcessRelapse(); break;
-                    case "5": DeleteUser(); break;
-                    case "0": running = false; break;
-                    default:
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Неверный ввод! Нажмите любую клавишу для повтора...");
-                        Console.ResetColor();
-                        Console.ReadKey();
-                        break;
-                }
+                RenderMainMenu();
             }
         }
-        private void RegisterNewUser()
+
+        private void RenderMainMenu()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("========================================");
+            Console.WriteLine("    ПРОГРАММА МОНИТОРИНГА ТРЕЗВОСТИ     ");
+            Console.WriteLine("             «ТРЕЗВЫЙ ПУТЬ»             ");
+            Console.WriteLine("========================================");
+            Console.ResetColor();
+            Console.WriteLine("1. Зарегистрировать нового пользователя");
+            Console.WriteLine("2. Посмотреть глобальный Лидерборд");
+            Console.WriteLine("3. Закодировать пользователя");
+            Console.WriteLine("4. Изменить данные пользователя (Срыв)");
+            Console.WriteLine("5. Удалить пользователя из системы");
+            Console.WriteLine("0. Выход");
+            Console.WriteLine("----------------------------------------");
+            Console.Write("Выберите действие: ");
+
+            string choice = Console.ReadLine();
+            switch (choice)
+            {
+                case "1": ProcessRegistrationInput(); break;
+                case "2": ShowLeaderboardMenu(); break;
+                case "3": ProcessIdSelection(CodeUserRequested, "=== ПРОЦЕДУРА КОДИРОВАНИЯ ==="); break;
+                case "4": ProcessIdSelection(RelapseUserRequested, "=== ФИКСАЦИЯ СРЫВА ==="); break;
+                case "5": ProcessIdSelection(DeleteUserRequested, "=== УДАЛЕНИЕ ИЗ СИСТЕМЫ ==="); break;
+                case "0": _running = false; break;
+                default:
+                    ShowMessage("Неверный ввод! Нажмите любую клавишу для повтора...", isError: true);
+                    Console.ReadKey();
+                    break;
+            }
+        }
+
+        private void ProcessRegistrationInput()
         {
             Console.Clear();
             Console.WriteLine("=== РЕГИСТРАЦИЯ НОВОГО ПОЛЬЗОВАТЕЛЯ ===");
 
             Console.Write("Введите Фамилию: ");
-            string surname = Console.ReadLine();
+            InputSurname = Console.ReadLine();
             Console.Write("Введите Имя: ");
-            string name = Console.ReadLine();
+            InputName = Console.ReadLine();
             Console.Write("Введите Отчество: ");
-            string patronymic = Console.ReadLine();
+            InputPatronymic = Console.ReadLine();
 
             Console.Write("Введите дату последнего употребления (ДД.ММ.ГГГГ) или оставьте пустой: ");
             string dateInput = Console.ReadLine();
 
-            DateTime? lastDrinkDate = null;
+            InputLastDrinkDate = null;
             if (!string.IsNullOrWhiteSpace(dateInput))
             {
                 if (DateTime.TryParseExact(dateInput, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
                 {
-                    lastDrinkDate = parsedDate;
+                    InputLastDrinkDate = parsedDate;
                 }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Неверный формат даты! Зарегистрирован с пустой датой.");
+                    Console.WriteLine("Неверный формат даты! Попытка регистрации с пустой датой.");
                     Console.ResetColor();
                 }
             }
 
-            _service.AddUser(name, surname, patronymic, lastDrinkDate);
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("\nПользователь успешно добавлен в систему трезвости!");
-            Console.ResetColor();
+            AddUserRequested?.Invoke();
             Console.ReadKey();
         }
 
-        private void ShowLeaderboard()
+        private void PrintLeaderboardRows()
         {
-            var leaderboard = _service.GetLeaderboard();
-            foreach (var user in leaderboard)
+            foreach (var dto in _currentLeaderboard)
             {
-                int days = _service.GetDaysSoberCount(user);
+                if (dto.IsCoded) Console.ForegroundColor = ConsoleColor.Yellow;
 
-                string statusText = user.IsCoded ? "Закодирован" : "Самостоятельно";
-                string fullName = $"{user.Surname} {user.Name} {user.Patronymic}";
-                string rank = _service.GetSoberStatus(user);
-
-                if (user.IsCoded) Console.ForegroundColor = ConsoleColor.Yellow;
-
-                Console.WriteLine($"{user.Id,-4} | {fullName,-30} | {days,-10} | {statusText + " [" + rank + "]",-25}");
+                Console.WriteLine($"{dto.Id,-4} | {dto.FullName,-30} | {dto.DaysSober,-10} | {dto.Method + " [" + dto.SoberRank + "]",-25}");
                 Console.ResetColor();
             }
         }
@@ -118,9 +129,8 @@ namespace SoberProgress.ConsoleView
         {
             Console.Clear();
 
-            var stats = _service.GetSystemStatistics();
             Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine($"[СТАТИСТИКА СИСТЕМЫ] Всего на учете: {stats.totalUsers} | Средняя трезвость: {stats.avgDays} дн. | Закодировано: {stats.codedCount} ({stats.codedPercentage}%)");
+            Console.WriteLine($"[СТАТИСТИКА СИСТЕМЫ] Всего на учете: {_currentStats.TotalUsers} | Средняя трезвость: {_currentStats.AvgDaysSober} дн. | Закодировано: {_currentStats.CodedCount} ({_currentStats.CodedPercentage}%)");
             Console.ResetColor();
 
             Console.WriteLine("=========================================================================");
@@ -129,128 +139,56 @@ namespace SoberProgress.ConsoleView
             Console.WriteLine($"{"ID",-4} | {"ФИО",-30} | {"Дней трезв",-10} | {"Статус",-15}");
             Console.WriteLine("-------------------------------------------------------------------------");
 
-            ShowLeaderboard();
+            PrintLeaderboardRows();
 
             Console.WriteLine("\nНажмите любую клавишу для возврата в меню...");
             Console.ReadKey();
         }
 
-        private void CodeUser()
+        private void ProcessIdSelection(Action targetEvent, string headerText)
         {
             Console.Clear();
-            Console.WriteLine("=== ПРОЦЕДУРА КОДИРОВАНИЯ ===");
+            Console.WriteLine(headerText);
+            Console.WriteLine("-------------------------------------------------------------------------");
+            PrintLeaderboardRows();
+            Console.WriteLine("-------------------------------------------------------------------------");
 
-            ShowLeaderboard();
-
-            Console.Write("Введите ID пользователя для кодирования: ");
-
+            Console.Write("\nВведите ID пользователя для проведения операции: ");
             if (int.TryParse(Console.ReadLine(), out int id))
             {
-                AlcoUser user = _service.ReadUser(id);
-                if (user != null)
-                {
-                    bool success = _service.Code(user);
-                    if (success)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"Успех! {user.Name} успешно закодирован программными методами!");
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Ошибка! Пользователь уже закодирован или данные неверны.");
-                    }
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Пользователь с таким ID не найден.");
-                }
+                SelectedUserId = id;
+                targetEvent?.Invoke();
             }
-            Console.ResetColor();
+            else
+            {
+                ShowMessage("Неверный формат ID!", isError: true);
+            }
             Console.ReadKey();
         }
 
-        private void ProcessRelapse()
+        public void ShowMessage(string message, bool isError = false)
         {
-            Console.Clear();
-            Console.WriteLine("=== ФИКСАЦИЯ СРЫВА ===");
-
-            ShowLeaderboard();
-
-            Console.Write("Введите ID сорвавшегося пользователя: ");
-
-            if (int.TryParse(Console.ReadLine(), out int id))
-            {
-                AlcoUser user = _service.ReadUser(id);
-                if (user != null)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Внимание! Сбрасываем прогресс для {user.Surname} {user.Name}.");
-                    Console.ResetColor();
-
-                    user.LastDrinkDate = DateTime.Now;
-                    user.IsCoded = false;
-
-                    _service.ChangeUser(user);
-
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("Данные обновлены. Счетчик дней сброшен. Путь начинается заново!");
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Пользователь не найден.");
-                }
-            }
+            Console.ForegroundColor = isError ? ConsoleColor.Red : ConsoleColor.Green;
+            Console.WriteLine($"\n{message}");
             Console.ResetColor();
-            Console.ReadKey();
         }
 
-        private void DeleteUser()
+        public bool ConfirmAction(string message)
         {
-            Console.Clear();
-            Console.WriteLine("=== Удаление ИЗ СИСТЕМЫ ===");
-
-            ShowLeaderboard();
-
-            Console.Write("Введите ID пользователя для удаления: ");
-
-            if (int.TryParse(Console.ReadLine(), out int id))
-            {
-                bool deleted = _service.RemoveUser(id);
-                if (deleted)
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("Пользователь успешно удален из картотеки.");
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Ошибка! Пользователь с таким ID не найден.");
-                }
-            }
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.Write($"\n{message} (y/n): ");
             Console.ResetColor();
-            Console.ReadKey();
+            string response = Console.ReadLine()?.Trim().ToLower();
+            return response == "y" || response == "yes";
         }
 
-        private void SeedData()
+        public void ClearInputFields()
         {
-            _service.AddUser("Даниил", "Иванов", "Павлович", DateTime.Now.AddDays(-67)); 
-            _service.AddUser("Илья", "Кузнецов", "Сергеевич", DateTime.Now.AddDays(-52));
-            _service.AddUser("Алексей", "Зайцев", "Степанович", DateTime.Now.AddDays(-1488));
-            _service.AddUser("Виктор", "Птицеедов", "Петухов", DateTime.Now.AddDays(-1));
-            _service.AddUser("Тимофей", "Милуш", "Дотерович", DateTime.Now.AddDays(0));
-
-
-            var users = _service.GetAllUsers();
-            foreach (var u in users)
-            {
-                if (u.Surname == "Зайцев")
-                {
-                    _service.Code(u);
-                }
-            }
+            InputName = null;
+            InputSurname = null;
+            InputPatronymic = null;
+            InputLastDrinkDate = null;
+            SelectedUserId = null;
         }
     }
 }

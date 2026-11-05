@@ -1,4 +1,7 @@
 <Solution>
+  <Project Path="DIContainer/DIContainer.csproj" Id="7854fa5c-279b-4020-8999-1f54fe9fa9c7" />
+  <Project Path="DTO/DTO.csproj" Id="e527eb66-1dea-403f-8382-04318c6e4607" />
+  <Project Path="Presenter/Presenter.csproj" Id="f65f0ba8-4799-469d-8645-8d48d5f97a37" />
   <Project Path="Shared/Shared.csproj" Id="0643411a-9630-4434-a116-974c0915b08f" />
   <Project Path="SoberProgress.ConsoleView/SoberProgress.ConsoleView.csproj" />
   <Project Path="SoberProgress.DataAccess/SoberProgress.DataAccess.csproj" />

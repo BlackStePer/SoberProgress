@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
-using SoberProgress.Domain;
 using SoberProgress.Domain.ModelInterfaces;
 using System.Data;
 
